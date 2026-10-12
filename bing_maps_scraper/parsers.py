@@ -359,6 +359,8 @@ def parse(page: Page, country: str = "IN") -> Listing:
         L.status = "ok"
     elif L.name or L.address or L.phone_raw:
         L.status, L.error = "partial", "missing " + ", ".join(k for k, v in (("name", L.name), ("address", L.address)) if not v)
+    elif "overlaybfpr" in page.xhr and not _entities(page.xhr["overlaybfpr"]):
+        L.status, L.error = "failed", "Bing rendered no listing card for this ypid (id not resolvable / listing removed); confirmed with Firecrawl"
     else:
         L.status, L.error = "failed", "no listing fields found (JS not rendered, wrong URL type, or selectors need calibration)"
     return L

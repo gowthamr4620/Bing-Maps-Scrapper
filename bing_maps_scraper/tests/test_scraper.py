@@ -133,6 +133,12 @@ def test_blocked_and_failed():
     assert parse(Page("https://www.bing.com/maps", error="HTTP 500")).status == "failed"
 
 
+def test_unresolvable_ypid_reports_clear_reason():
+    L = parse(Page("https://www.bing.com/maps?ss=ypid.YN873x123", html="<html><body>map</body></html>",
+                   xhr={"overlaybfpr": "<link rel='preconnect'/>"}, fetcher="playwright"))
+    assert L.status == "failed" and "no listing card" in L.error
+
+
 # ---- pipeline ----
 def test_offline_reparse_pipeline_and_no_url_rows(tmp_path: Path):
     inp = tmp_path / "in.csv"
