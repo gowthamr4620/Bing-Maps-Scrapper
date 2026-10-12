@@ -15,6 +15,7 @@ class Page:
     fetcher: str = ""
     final_url: str = ""
     llm_json: dict | None = None  # optional Firecrawl structured extraction
+    xhr: dict = field(default_factory=dict)  # captured background responses (e.g. Bing overlaybfpr)
     error: str = ""
 
 
@@ -30,6 +31,8 @@ class Listing:
     phone_digits: str = ""
     website: str = ""
     website_domain: str = ""
+    category: str = ""
+    open_status: str = ""
     latitude: float | None = None
     longitude: float | None = None
     hours_raw: str = ""

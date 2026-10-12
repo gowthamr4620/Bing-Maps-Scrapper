@@ -59,3 +59,18 @@ def classify(url: str) -> dict:
     elif "cp" in q and (ll := _latlon_from(q["cp"])):
         info.update(lat=ll[0], lon=ll[1], lat_lon_source="url_cp")
     return info
+
+
+def fetch_url(url: str, lang: str = "en", mkt: str = "en-IN") -> str:
+    """URL actually requested. Bing localises Maps pages (we got Hindi for an IN request),
+    so force the language; `ss=ypid.X` links are rewritten to the canonical /maps/ form."""
+    info = classify(url)
+    if info["kind"] not in ("maps_place", "maps_search") or "bing.com" not in urlparse(url).netloc.lower():
+        return url
+    if info["ypid"] and "ss=ypid." in url:
+        return f"https://www.bing.com/maps/?ss=ypid.{info['ypid']}&setlang={lang}&mkt={mkt}"
+    q = parse_qs(urlparse(url).query)
+    missing = {k: v for k, v in (("setlang", lang), ("mkt", mkt)) if k not in {x.lower() for x in q}}
+    if not missing:
+        return url
+    return url + ("&" if "?" in url else "?") + "&".join(f"{k}={v}" for k, v in missing.items())
